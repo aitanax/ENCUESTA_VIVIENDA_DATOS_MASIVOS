@@ -1,0 +1,52 @@
+{% extends "base.html" %}
+
+{% block title %}Recomendador de municipios{% endblock %}
+
+{% block content %}
+  <section>
+    <h2>Recomendador de municipios</h2>
+    <p>
+      Indica la importancia relativa que le das a cada dimensión (0–5) y, opcionalmente,
+      el tipo de municipio según su tamaño poblacional.
+    </p>
+
+    <form method="post" action="{{ url_for('recomendador') }}" class="form-encuesta">
+      <label>
+        Economía:
+        <input type="number" name="economia" min="0" max="5" step="1" value="3">
+      </label>
+
+      <label>
+        Educación:
+        <input type="number" name="educacion" min="0" max="5" step="1" value="3">
+      </label>
+
+      <label>
+        Sanidad:
+        <input type="number" name="sanidad" min="0" max="5" step="1" value="3">
+      </label>
+
+      <label>
+        Transporte:
+        <input type="number" name="transporte" min="0" max="5" step="1" value="3">
+      </label>
+
+      <label>
+        Vivienda:
+        <input type="number" name="vivienda" min="0" max="5" step="1" value="3">
+      </label>
+
+      <label>
+        Tipo de municipio (población):
+        <select name="cluster">
+          <option value="cualquiera">Cualquiera</option>
+          {% for c in clusters %}
+            <option value="{{ c }}">{{ c|capitalize }}</option>
+          {% endfor %}
+        </select>
+      </label>
+
+      <button type="submit" class="btn">Calcular recomendación</button>
+    </form>
+  </section>
+{% endblock %}

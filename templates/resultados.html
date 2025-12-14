@@ -1,0 +1,62 @@
+{% extends "base.html" %}
+
+{% block title %}Resultados de la recomendación{% endblock %}
+
+{% block content %}
+  <section>
+    <h2>Resultados de la recomendación</h2>
+
+    <p>Pesos utilizados en la recomendación:</p>
+    <ul>
+      <li>Economía: {{ pesos.economia }}</li>
+      <li>Educación: {{ pesos.educacion }}</li>
+      <li>Sanidad: {{ pesos.sanidad }}</li>
+      <li>Transporte: {{ pesos.transporte }}</li>
+      <li>Vivienda: {{ pesos.vivienda }}</li>
+    </ul>
+
+    <p>
+      Tipo de municipio seleccionado:
+      {% if cluster_preferido == "cualquiera" %}
+        <strong>Cualquiera</strong>
+      {% else %}
+        <strong>{{ cluster_preferido|capitalize }}</strong>
+      {% endif %}
+    </p>
+
+    <h3>Top 10 municipios recomendados</h3>
+    <table>
+      <thead>
+        <tr>
+          <th>Municipio</th>
+          <th>Clúster poblacional</th>
+          <th>Índice personalizado</th>
+          <th>Economía</th>
+          <th>Educación</th>
+          <th>Sanidad</th>
+          <th>Transporte</th>
+          <th>Vivienda</th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for row in resultados %}
+          <tr>
+            <td>{{ row.municipio }}</td>
+            <td>{{ row.cluster_poblacion }}</td>
+            <td>{{ "%.3f"|format(row.indice_personalizado) }}</td>
+            <td>{{ "%.3f"|format(row.economia) }}</td>
+            <td>{{ "%.3f"|format(row.educacion) }}</td>
+            <td>{{ "%.3f"|format(row.sanidad) }}</td>
+            <td>{{ "%.3f"|format(row.transporte) }}</td>
+            <td>{{ "%.3f"|format(row.vivienda) }}</td>
+          </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+
+    <p>
+      A partir de esta tabla, el usuario puede explorar con más detalle los municipios
+      recomendados utilizando los paneles de visualización construidos en Tableau.
+    </p>
+  </section>
+{% endblock %}
