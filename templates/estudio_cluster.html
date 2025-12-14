@@ -1,0 +1,17 @@
+{% extends "base.html" %}
+{% block title %}Estudio por clúster{% endblock %}
+
+{% block content %}
+<div class="card">
+  <h2>📊 Estudio por clúster</h2>
+  <form method="post" class="form-encuesta">
+    <label for="cluster">Selecciona un clúster:</label>
+    <select name="cluster" id="cluster">
+      {% for c, label in clusters %}
+        <option value="{{ c }}">{{ label }}</option>
+      {% endfor %}
+    </select>
+    <button type="submit" class="btn">🔍 Consultar</button>
+  </form>
+</div>
+{% endblock %}

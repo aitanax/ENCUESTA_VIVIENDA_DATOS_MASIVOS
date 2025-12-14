@@ -1,0 +1,19 @@
+<!-- templates/estudio_municipio.html -->
+{% extends "base.html" %}
+{% block title %}Estudio de un municipio{% endblock %}
+{% block content %}
+  <section>
+    <h2>🏘️ Estudio de un municipio</h2>
+    <form method="post">
+      <label>Selecciona municipio:
+        <select name="municipio">
+          {% for m in municipios %}
+            <option value="{{ m }}">{{ m }}</option>
+          {% endfor %}
+        </select>
+      </label>
+      <button type="submit" class="btn">Ver análisis</button>
+    </form>
+  </section>
+{% endblock %}
+

@@ -1,61 +1,104 @@
+/* Fuente moderna */
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;600&display=swap');
+
+:root {
+  --primary-color: #0077cc;
+  --background-color: #f9f9f9;
+  --text-color: #222;
+  --header-bg: #003366;
+  --header-text: #fff;
+  --card-bg: #fff;
+  --shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+  --border-radius: 12px;
+  --focus-outline: 3px solid #ffbf47;
+  --font-size: 16px;
+}
+
+/* Modo alto contraste (por clase) */
+body.high-contrast {
+  --background-color: #000;
+  --text-color: #fff;
+  --card-bg: #111;
+  --header-bg: #000;
+  --primary-color: #ffbf47;
+}
+
 body {
-  font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+  font-family: 'Poppins', sans-serif;
   margin: 0;
-  background: #f6f6f6;
-  color: #222;
+  background: var(--background-color);
+  color: var(--text-color);
+  font-size: var(--font-size);
+  line-height: 1.6;
+  transition: all 0.2s ease-in-out;
 }
 
 header {
-  background: #003366;
-  color: white;
+  background: var(--header-bg);
+  color: var(--header-text);
   padding: 1rem 2rem;
   display: flex;
   justify-content: space-between;
   align-items: center;
+  flex-wrap: wrap;
 }
 
 header h1 {
   margin: 0;
-  font-size: 1.3rem;
+  font-size: 1.5rem;
 }
 
 nav a {
-  color: white;
+  color: var(--header-text);
   margin-left: 1rem;
   text-decoration: none;
+  font-weight: 500;
 }
 
 main {
   padding: 2rem;
+  max-width: 960px;
+  margin: auto;
 }
 
 section {
-  background: white;
-  padding: 1.5rem;
-  border-radius: 8px;
-  box-shadow: 0 2px 6px rgba(0,0,0,0.06);
+  background: var(--card-bg);
+  padding: 2rem;
+  border-radius: var(--border-radius);
+  box-shadow: var(--shadow);
+  margin-bottom: 2rem;
 }
 
-.form-encuesta label {
+label {
   display: block;
-  margin-bottom: 0.75rem;
+  margin: 1rem 0 0.5rem;
 }
 
-input[type="number"] {
-  margin-left: 0.5rem;
-  width: 4rem;
+input[type="number"],
+select {
+  padding: 0.4rem;
+  border: 1px solid #ccc;
+  border-radius: 6px;
+  width: 100%;
+  max-width: 300px;
 }
 
 .btn {
   display: inline-block;
-  margin-top: 1rem;
-  padding: 0.5rem 1rem;
-  background: #0077cc;
+  margin-top: 1.2rem;
+  padding: 0.6rem 1.2rem;
+  background: var(--primary-color);
   color: white;
-  border-radius: 4px;
+  border-radius: 6px;
   text-decoration: none;
   border: none;
   cursor: pointer;
+  font-weight: 600;
+}
+
+.btn:hover,
+.btn:focus {
+  background: #005fa3;
 }
 
 table {
@@ -64,12 +107,141 @@ table {
   margin-top: 1rem;
 }
 
-th, td {
-  border: 1px solid #ddd;
-  padding: 0.4rem 0.6rem;
-  font-size: 0.9rem;
+th,
+td {
+  border: 1px solid #ccc;
+  padding: 0.6rem 0.8rem;
+  text-align: left;
 }
 
 th {
-  background: #eee;
+  background: #f0f0f0;
+}
+
+/* Barra de accesibilidad */
+#accesibilidad {
+  display: flex;
+  justify-content: flex-end;
+  align-items: center;
+  gap: 1rem;
+  background: #e6e6e6;
+  padding: 0.5rem 1rem;
+  font-size: 0.9rem;
+}
+
+#accesibilidad select,
+#accesibilidad button {
+  padding: 0.3rem 0.6rem;
+  font-size: 0.9rem;
+}
+
+footer {
+  text-align: center;
+  font-size: 0.85rem;
+  padding: 1rem;
+  color: #666;
+}
+
+/* Selector de idioma */
+#idioma-selector {
+  margin-left: auto;
+}
+
+/* Accesibilidad para foco */
+:focus {
+  outline: var(--focus-outline);
+  outline-offset: 2px;
+}
+
+/* Responsive */
+@media (max-width: 600px) {
+  nav {
+    width: 100%;
+    margin-top: 0.5rem;
+  }
+
+  nav a {
+    display: block;
+    margin: 0.4rem 0;
+  }
+
+  input[type="number"],
+  select {
+    width: 100%;
+  }
+}
+
+.inicio-container {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  min-height: 70vh;
+  background-color: #f9f9f9;
+}
+
+.botones-opciones {
+  display: flex;
+  flex-direction: column;  /* 🟢 Importante para apilarlos verticalmente */
+  gap: 1rem;               /* 🟢 Espacio entre botones */
+  margin-top: 2rem;
+  align-items: center;     /* 🟢 Centrar botones horizontalmente */
+}
+
+.botones-opciones .btn {
+  width: 100%;
+  max-width: 300px;        /* 🟢 Tamaño uniforme */
+  text-align: center;
+}
+
+
+.card-opciones {
+  background: white;
+  padding: 2rem 3rem;
+  border-radius: 16px;
+  box-shadow: 0 8px 24px rgba(0,0,0,0.1);
+  text-align: center;
+  max-width: 600px;
+  width: 90%;
+  animation: fadeIn 0.8s ease-in;
+}
+
+.card-opciones h2 {
+  margin-bottom: 1rem;
+  font-size: 1.8rem;
+  color: #222;
+}
+
+.card-opciones p {
+  margin-bottom: 2rem;
+  color: #555;
+}
+
+.card-opciones ul {
+  list-style: none;
+  padding: 0;
+}
+
+.card-opciones li {
+  margin: 1rem 0;
+}
+
+.btn-opcion {
+  display: inline-block;
+  background-color: #007BFF;
+  color: white;
+  padding: 0.8rem 1.5rem;
+  border-radius: 8px;
+  text-decoration: none;
+  font-weight: 600;
+  font-size: 1rem;
+  transition: background-color 0.3s ease;
+}
+
+.btn-opcion:hover {
+  background-color: #005dc1;
+}
+
+@keyframes fadeIn {
+  from { opacity: 0; transform: translateY(10px); }
+  to { opacity: 1; transform: translateY(0); }
 }

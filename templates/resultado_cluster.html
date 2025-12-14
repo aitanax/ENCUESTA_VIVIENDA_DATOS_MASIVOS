@@ -1,0 +1,37 @@
+{% extends "base.html" %}
+{% block title %}Resultados del clúster{% endblock %}
+
+{% block content %}
+<div class="card">
+  <h2>📍 Municipios con {{ cluster }}</h2>
+
+  <div id="grafico-cluster" style="height: 600px;"></div>
+
+  <table class="tabla-resultados">
+    <thead>
+      <tr>
+        <th>Municipio</th>
+        <th>Índice medio</th>
+      </tr>
+    </thead>
+    <tbody>
+      {% for r in datos %}
+        <tr>
+          <td>{{ r["Nombre"] }}</td>
+          <td>{{ "%.3f"|format(r["mean_per_row"]) }}</td>
+        </tr>
+      {% endfor %}
+    </tbody>
+  </table>
+
+  <a href="{{ url_for('estudio_cluster') }}" class="btn-secundario">🔙 Volver</a>
+</div>
+
+<!-- Incluir Plotly -->
+<script src="https://cdn.plot.ly/plotly-latest.min.js"></script>
+<script>
+  const clusterData = JSON.parse({{ grafico | tojson | safe }});
+  Plotly.newPlot("grafico-cluster", clusterData.data, clusterData.layout);
+</script>
+
+{% endblock %}

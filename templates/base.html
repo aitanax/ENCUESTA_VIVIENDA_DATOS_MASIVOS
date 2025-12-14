@@ -2,8 +2,211 @@
 <html lang="es">
 <head>
   <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>{% block title %}Índice de atractividad territorial{% endblock %}</title>
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+  <style>
+    :root {
+      --azul: #1f3c88;
+      --azul-hover: #163174;
+      --gris-fondo: #f4f6f9;
+      --contraste-bg: #000;
+      --contraste-texto: #fff;
+      --resaltado: #00ffff;
+    }
+
+    body {
+      font-family: 'Poppins', sans-serif;
+      margin: 0;
+      padding: 0;
+      font-size: 16px;
+      background-color: var(--gris-fondo);
+      transition: background-color 0.3s, color 0.3s;
+    }
+
+    header {
+      background-color: var(--azul);
+      color: white;
+      padding: 2rem 1rem;
+      text-align: center;
+    }
+
+    header h1 {
+      margin-left: 30px;
+      font-size: 2rem;
+    }
+
+    nav {
+      margin-top: 0.5rem;
+    }
+
+    nav a {
+      color: white;
+      margin: 0 1rem;
+      text-decoration: none;
+      font-weight: bold;
+      position: relative;
+      padding: 0.3rem;
+      transition: color 0.3s;
+    }
+
+    nav a::after {
+      content: '';
+      position: absolute;
+      bottom: 0;
+      left: 0;
+      width: 0;
+      height: 2px;
+      background-color: white;
+      transition: width 0.3s ease;
+    }
+
+    nav a:hover::after {
+      width: 100%;
+    }
+
+    nav a:hover {
+      color: #cce5ff;
+    }
+
+    .accesibilidad {
+      background-color: #e9f0ff;
+      padding: 0.8rem 1rem;
+      display: flex;
+      gap: 1rem;
+      align-items: center;
+      justify-content: center;
+      flex-wrap: wrap;
+      font-size: 0.9rem;
+    }
+
+    .accesibilidad select,
+    .accesibilidad button {
+      padding: 0.4rem 0.6rem;
+      border-radius: 5px;
+      border: 1px solid #ccc;
+      cursor: pointer;
+      transition: background-color 0.3s, color 0.3s;
+    }
+
+    main {
+    padding: 4rem 5vw;
+    margin-bottom: 4rem;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height:auto;
+    box-sizing: border-box;
+  }
+
+    footer {
+      position: fixed;
+      bottom: 0;
+      left: 0;
+      width: 100%;
+      background-color: #1f3c88;
+      color: white;
+      text-align: center;
+      padding: 0.8rem;
+      font-size: 0.9rem;
+      z-index: 1000;
+    }
+
+
+    .alto-contraste {
+      background-color: var(--contraste-bg) !important;
+      color: var(--contraste-texto) !important;
+    }
+
+    .alto-contraste a {
+      color: var(--resaltado) !important;
+    }
+
+    .card {
+      background-color: white;
+      padding: 2rem;
+      border-radius: 12px;
+      box-shadow: 0 5px 20px rgba(0, 0, 0, 0.08);
+      max-width: 800px;
+      width: 100%;
+      text-align: center;
+    }
+
+    .btn {
+      display: inline-block;
+      background-color: var(--azul);
+      color: white;
+      padding: 0.7rem 1.4rem;
+      border-radius: 8px;
+      text-decoration: none;
+      font-weight: bold;
+      transition: transform 0.2s ease, background-color 0.3s ease;
+      margin-top: 1rem;
+    }
+
+    .btn:hover {
+      background-color: var(--azul-hover);
+      transform: scale(1.05);
+    }
+
+    .btn-secundario {
+      background-color: #888;
+      color: white;
+      padding: 0.5rem 1rem;
+      border-radius: 6px;
+      text-decoration: none;
+      margin-top: 1rem;
+      display: inline-block;
+    }
+
+    .tabla-resultados {
+      width: 100%;
+      border-collapse: collapse;
+      margin-top: 1rem;
+    }
+
+    .tabla-resultados th, .tabla-resultados td {
+      padding: 0.6rem;
+      border-bottom: 1px solid #ccc;
+      text-align: left;
+    }
+
+    .tabla-resultados th {
+      background-color: #e0e0e0;
+    }
+
+    .form-encuesta label {
+      display: block;
+      margin: 1rem 0 0.5rem;
+    }
+
+    .form-encuesta input, .form-encuesta select {
+      padding: 0.5rem;
+      width: 100%;
+      max-width: 300px;
+    }
+
+    ul.datos-lista {
+      list-style: none;
+      padding: 0;
+    }
+
+    ul.datos-lista li {
+      padding: 0.4rem 0;
+    }
+
+    @media (max-width: 768px) {
+      .card {
+        padding: 1.5rem;
+      }
+
+      nav a {
+        display: inline-block;
+        margin: 0.5rem;
+      }
+    }
+  </style>
 </head>
 <body>
   <header>
@@ -11,8 +214,36 @@
     <nav>
       <a href="{{ url_for('index') }}">Inicio</a>
       <a href="{{ url_for('recomendador') }}">Recomendador</a>
+      <a href="{{ url_for('estudio_municipio') }}">Estudio municipio</a>
+      <a href="{{ url_for('estudio_cluster') }}">Estudio Comunidad</a>
     </nav>
   </header>
+
+  <div class="accesibilidad">
+    <label>
+      Tamaño texto:
+      <select onchange="document.body.style.fontSize=this.value">
+        <option value="16px">Normal</option>
+        <option value="18px">Grande</option>
+        <option value="20px">Muy grande</option>
+      </select>
+    </label>
+
+    <label>
+      Contraste pantalla:<br>
+      <button onclick="document.body.classList.toggle('alto-contraste')">
+        🌓 Alto contraste
+      </button>
+    </label>
+
+    <label>
+      Idioma:
+      <select onchange="cambiarIdioma(this.value)">
+        <option value="es">🇪🇸 Español</option>
+        <option value="en">🇬🇧 English</option>
+      </select>
+    </label>
+  </div>
 
   <main>
     {% block content %}{% endblock %}
@@ -21,5 +252,11 @@
   <footer>
     <p>Proyecto de integración de datos territoriales · Local</p>
   </footer>
+
+  <script>
+    function cambiarIdioma(lang) {
+      alert("Idioma seleccionado: " + lang + " (traducción aún no implementada)");
+    }
+  </script>
 </body>
 </html>

@@ -1,0 +1,42 @@
+{% extends "base.html" %}
+{% block title %}Datos del municipio{% endblock %}
+
+{% block content %}
+<div class="card">
+  <h2>📍 {{ datos["Nombre"] }}</h2>
+
+  <details open>
+    <summary><strong>🧭 Perfil general del municipio</strong></summary>
+    <div id="radar" style="height:400px;"></div>
+  </details>
+
+  <details>
+    <summary><strong>📦 Comparación con todos los bloques</strong></summary>
+    <div id="boxplot" style="height:500px;"></div>
+  </details>
+
+  <details>
+    <summary><strong>📋 Valores detallados</strong></summary>
+    <ul class="datos-lista">
+      {% for k,v in datos.items() %}
+        <li><strong>{{ k }}:</strong> {{ "%.3f"|format(v) if v is number else v }}</li>
+      {% endfor %}
+    </ul>
+  </details>
+
+  <a href="{{ url_for('estudio_municipio') }}" class="btn-secundario">Volver</a>
+</div>
+
+<script src="https://cdn.plot.ly/plotly-latest.min.js"></script>
+<script>
+  Plotly.newPlot("radar",
+    {{ radar | safe }}.data,
+    {{ radar | safe }}.layout
+  );
+
+  Plotly.newPlot("boxplot",
+    {{ boxplot | safe }}.data,
+    {{ boxplot | safe }}.layout
+  );
+</script>
+{% endblock %}

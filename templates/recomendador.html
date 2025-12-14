@@ -3,50 +3,218 @@
 {% block title %}Recomendador de municipios{% endblock %}
 
 {% block content %}
-  <section>
-    <h2>Recomendador de municipios</h2>
-    <p>
-      Indica la importancia relativa que le das a cada dimensión (0–5) y, opcionalmente,
-      el tipo de municipio según su tamaño poblacional.
-    </p>
+<style>
+  .test-container {
+    max-width: 720px;
+    margin: auto;
+    background: #fff;
+    padding: 2rem;
+    border-radius: 14px;
+    box-shadow: 0 12px 28px rgba(0, 0, 0, 0.1);
+  }
 
-    <form method="post" action="{{ url_for('recomendador') }}" class="form-encuesta">
-      <label>
-        Economía:
-        <input type="number" name="economia" min="0" max="5" step="1" value="3">
-      </label>
+  .test-step {
+    display: none;
+    flex-direction: column;
+    align-items: center;
+    text-align: center;
+  }
 
-      <label>
-        Educación:
-        <input type="number" name="educacion" min="0" max="5" step="1" value="3">
-      </label>
+  .test-step.active {
+    display: flex;
+  }
 
-      <label>
-        Sanidad:
-        <input type="number" name="sanidad" min="0" max="5" step="1" value="3">
-      </label>
+  .test-step img {
+    width: 100%;
+    max-height: 220px;
+    object-fit: cover;
+    border-radius: 12px;
+    margin: 1rem 0;
+  }
 
-      <label>
-        Transporte:
-        <input type="number" name="transporte" min="0" max="5" step="1" value="3">
-      </label>
+  .test-step label {
+    font-size: 1.05rem;
+    margin-bottom: 0.5rem;
+    font-weight: 600;
+  }
 
-      <label>
-        Vivienda:
-        <input type="number" name="vivienda" min="0" max="5" step="1" value="3">
-      </label>
+  .test-step select {
+    padding: 0.6rem;
+    font-size: 1rem;
+    border-radius: 8px;
+    width: 100%;
+    max-width: 320px;
+  }
 
-      <label>
-        Tipo de municipio (población):
-        <select name="cluster">
-          <option value="cualquiera">Cualquiera</option>
-          {% for c in clusters %}
-            <option value="{{ c }}">{{ c|capitalize }}</option>
-          {% endfor %}
-        </select>
-      </label>
+  .nav-buttons {
+    margin-top: 2rem;
+    display: flex;
+    justify-content: space-between;
+    width: 100%;
+  }
 
-      <button type="submit" class="btn">Calcular recomendación</button>
-    </form>
-  </section>
+  .btn-nav, .btn-submit {
+    padding: 0.7rem 1.4rem;
+    background-color: #1f3c88;
+    color: white;
+    border: none;
+    border-radius: 10px;
+    cursor: pointer;
+    font-size: 1rem;
+    transition: background 0.3s ease, transform 0.15s ease;
+  }
+
+  .btn-nav:hover, .btn-submit:hover {
+    background-color: #163174;
+    transform: scale(1.03);
+  }
+
+  .btn-submit {
+    width: 100%;
+    margin-top: 2rem;
+  }
+</style>
+
+<div class="test-container">
+  <h2>🧭 Recomendador de municipios</h2>
+  <p>Responde unas preguntas sencillas y te recomendaremos municipios acordes a ti.</p>
+
+  <form id="test-form" method="post" action="{{ url_for('recomendador') }}">
+
+    <!-- 1️⃣ POBLACIÓN (CLÚSTER) -->
+    <div class="test-step active">
+      <label>¿Te gustaría vivir en un municipio con mucha, media o poca población?</label>
+      <img src="{{ url_for('static', filename='img/poblacion.jpg') }}" alt="Tipo de población">
+      <select name="cluster" required>
+        <option value="3">Mucha gente (ciudades grandes)</option>
+        <option value="2">Población media</option>
+        <option value="1">Poca gente / tranquilidad</option>
+      </select>
+    </div>
+
+    <!-- 2️⃣ EDUCACIÓN -->
+    <div class="test-step">
+      <label>¿Tienes hijos que estudien o te importa la calidad educativa?</label>
+      <img src="{{ url_for('static', filename='img/educacion.jpg') }}" alt="Educación">
+      <select name="educacion">
+        <option value="5">Sí, es muy importante</option>
+        <option value="3">Algo importante</option>
+        <option value="1">Poco importante</option>
+      </select>
+    </div>
+
+    <!-- 3️⃣ SANIDAD -->
+    <div class="test-step">
+      <label>¿Necesitas acceso frecuente a servicios sanitarios?</label>
+      <img src="{{ url_for('static', filename='img/salud.jpg') }}" alt="Sanidad">
+      <select name="salud">
+        <option value="5">Sí, es clave</option>
+        <option value="3">A veces</option>
+        <option value="1">No especialmente</option>
+      </select>
+    </div>
+
+    <!-- 4️⃣ TRANSPORTE -->
+    <div class="test-step">
+      <label>¿Qué tan importante es para ti el transporte público?</label>
+      <img src="{{ url_for('static', filename='img/transporte.jpg') }}" alt="Transporte">
+      <select name="transporte">
+        <option value="5">Muy importante</option>
+        <option value="3">Importancia media</option>
+        <option value="1">Poco importante</option>
+      </select>
+    </div>
+
+    <!-- 5️⃣ ECONOMÍA -->
+    <div class="test-step">
+      <label>¿Buscas oportunidades laborales o económicas en el municipio?</label>
+      <img src="{{ url_for('static', filename='img/economia.jpg') }}" alt="Economía">
+      <select name="economia">
+        <option value="5">Sí, mucho</option>
+        <option value="3">Algo</option>
+        <option value="1">No es prioritario</option>
+      </select>
+    </div>
+
+    <!-- 6️⃣ VIVIENDA -->
+    <div class="test-step">
+      <label>¿Qué tan importante es el acceso a vivienda asequible?</label>
+      <img src="{{ url_for('static', filename='img/vivienda.jpg') }}" alt="Vivienda">
+      <select name="housing">
+        <option value="5">Muy importante</option>
+        <option value="3">Importancia media</option>
+        <option value="1">Poco importante</option>
+      </select>
+    </div>
+
+    <!-- 7️⃣ ENTORNO -->
+    <div class="test-step">
+      <label>¿Prefieres un entorno más urbano o más natural?</label>
+      <img src="{{ url_for('static', filename='img/entorno.jpg') }}" alt="Entorno">
+      <select name="entorno">
+        <option value="urbano">Urbano</option>
+        <option value="mixto">Mixto</option>
+        <option value="natural">Natural</option>
+      </select>
+    </div>
+
+    <!-- 8️⃣ OCIO -->
+    <div class="test-step">
+      <label>¿Qué tan importante es para ti el ocio, cultura y actividades?</label>
+      <img src="{{ url_for('static', filename='img/cultura.jpeg') }}" alt="Cultura">
+      <select name="ocio">
+        <option value="5">Muy importante</option>
+        <option value="3">Importancia media</option>
+        <option value="1">Poco importante</option>
+      </select>
+    </div>
+
+    <!-- NAVEGACIÓN -->
+    <div class="nav-buttons">
+      <button type="button" class="btn-nav" id="prevBtn">← Anterior</button>
+      <button type="button" class="btn-nav" id="nextBtn">Siguiente →</button>
+    </div>
+
+    <!-- SUBMIT -->
+    <button type="submit" class="btn-submit" id="submitBtn" style="display:none">
+      🔍 Ver 3 municipios recomendados
+    </button>
+  </form>
+
+  
+</div>
+
+<script>
+  const steps = document.querySelectorAll(".test-step");
+  const prevBtn = document.getElementById("prevBtn");
+  const nextBtn = document.getElementById("nextBtn");
+  const submitBtn = document.getElementById("submitBtn");
+  let currentStep = 0;
+
+  function showStep(index) {
+    steps.forEach((step, i) => {
+      step.classList.toggle("active", i === index);
+    });
+
+    prevBtn.style.display = index === 0 ? "none" : "inline-block";
+    nextBtn.style.display = index === steps.length - 1 ? "none" : "inline-block";
+    submitBtn.style.display = index === steps.length - 1 ? "inline-block" : "none";
+  }
+
+  prevBtn.onclick = () => {
+    if (currentStep > 0) {
+      currentStep--;
+      showStep(currentStep);
+    }
+  };
+
+  nextBtn.onclick = () => {
+    if (currentStep < steps.length - 1) {
+      currentStep++;
+      showStep(currentStep);
+    }
+  };
+
+  showStep(currentStep);
+</script>
 {% endblock %}

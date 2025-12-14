@@ -1,62 +1,78 @@
 {% extends "base.html" %}
-
 {% block title %}Resultados de la recomendación{% endblock %}
 
 {% block content %}
-  <section>
-    <h2>Resultados de la recomendación</h2>
+<style>
+  .recomendacion-container {
+    max-width: 960px;
+    margin: 2rem auto;
+    background: #fff;
+    padding: 2rem;
+    border-radius: 14px;
+    box-shadow: 0 10px 30px rgba(0,0,0,0.08);
+  }
 
-    <p>Pesos utilizados en la recomendación:</p>
-    <ul>
-      <li>Economía: {{ pesos.economia }}</li>
-      <li>Educación: {{ pesos.educacion }}</li>
-      <li>Sanidad: {{ pesos.sanidad }}</li>
-      <li>Transporte: {{ pesos.transporte }}</li>
-      <li>Vivienda: {{ pesos.vivienda }}</li>
-    </ul>
+  .recomendacion-container h2 {
+    font-size: 1.8rem;
+    margin-bottom: 1rem;
+    color: #1f3c88;
+  }
 
-    <p>
-      Tipo de municipio seleccionado:
-      {% if cluster_preferido == "cualquiera" %}
-        <strong>Cualquiera</strong>
-      {% else %}
-        <strong>{{ cluster_preferido|capitalize }}</strong>
-      {% endif %}
-    </p>
+  .municipio-lista {
+    margin-top: 1rem;
+  }
 
-    <h3>Top 10 municipios recomendados</h3>
-    <table>
-      <thead>
-        <tr>
-          <th>Municipio</th>
-          <th>Clúster poblacional</th>
-          <th>Índice personalizado</th>
-          <th>Economía</th>
-          <th>Educación</th>
-          <th>Sanidad</th>
-          <th>Transporte</th>
-          <th>Vivienda</th>
-        </tr>
-      </thead>
-      <tbody>
-        {% for row in resultados %}
-          <tr>
-            <td>{{ row.municipio }}</td>
-            <td>{{ row.cluster_poblacion }}</td>
-            <td>{{ "%.3f"|format(row.indice_personalizado) }}</td>
-            <td>{{ "%.3f"|format(row.economia) }}</td>
-            <td>{{ "%.3f"|format(row.educacion) }}</td>
-            <td>{{ "%.3f"|format(row.sanidad) }}</td>
-            <td>{{ "%.3f"|format(row.transporte) }}</td>
-            <td>{{ "%.3f"|format(row.vivienda) }}</td>
-          </tr>
-        {% endfor %}
-      </tbody>
-    </table>
+  .municipio-item {
+    margin-bottom: 1.5rem;
+    padding: 1rem;
+    background-color: #f5f8ff;
+    border-radius: 10px;
+  }
 
-    <p>
-      A partir de esta tabla, el usuario puede explorar con más detalle los municipios
-      recomendados utilizando los paneles de visualización construidos en Tableau.
-    </p>
-  </section>
+  .municipio-item h3 {
+    margin-bottom: 0.5rem;
+    font-size: 1.2rem;
+    color: #1f3c88;
+  }
+
+  .municipio-item p {
+    margin: 0;
+    font-size: 1rem;
+  }
+
+  #grafico {
+    margin-top: 3rem;
+  }
+</style>
+
+<div class="recomendacion-container">
+  <h2>🏆 Resultados de la recomendación</h2>
+  <p>Estos municipios destacan según tus respuestas. Cada uno ha sido recomendado por una dimensión concreta.</p>
+
+  <div class="municipio-lista">
+    {% for row in resultados %}
+      <div class="municipio-item">
+        <h3>{{ row.Nombre }}</h3>
+        <p>📌 Recomendado por: <strong>{{ row.destaca_en|capitalize }}</strong></p>
+        <ul>
+          <li>Educación: {{ "%.3f"|format(row.educacion) }}</li>
+          <li>Sanidad: {{ "%.3f"|format(row.salud) }}</li>
+          <li>Transporte: {{ "%.3f"|format(row.transporte) }}</li>
+          <li>Economía: {{ "%.3f"|format(row.economia) }}</li>
+          <li>Vivienda: {{ "%.3f"|format(row.housing) }}</li>
+        </ul>
+      </div>
+    {% endfor %}
+  </div>
+
+  <!-- GRÁFICO -->
+  <div id="grafico"></div>
+</div>
+
+<!-- PLOTLY -->
+<script src="https://cdn.plot.ly/plotly-latest.min.js"></script>
+<script>
+  const graficoData = {{ grafico | safe }};
+  Plotly.newPlot('grafico', graficoData.data, graficoData.layout);
+</script>
 {% endblock %}

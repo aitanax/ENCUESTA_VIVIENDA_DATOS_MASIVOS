@@ -1,19 +1,18 @@
 {% extends "base.html" %}
 
-{% block title %}Inicio · Índice de atractividad{% endblock %}
+{% block title %}Inicio · Índice de Atractividad{% endblock %}
 
 {% block content %}
-  <section>
-    <h2>Descripción general</h2>
-    <p>
-      Esta aplicación integra múltiples fuentes de datos territoriales para calcular
-      un índice de atractividad de los municipios de la Comunidad de Madrid en función
-      de cinco dimensiones: economía, educación, sanidad, transporte y vivienda.
-    </p>
-    <p>
-      A través del recomendador puedes indicar tus preferencias y obtener una lista
-      de municipios que se ajustan mejor a tus prioridades.
-    </p>
-    <a class="btn" href="{{ url_for('recomendador') }}">Ir al recomendador</a>
-  </section>
+<div class="inicio-wrapper">
+  <div class="card">
+    <h2>¿Qué deseas hacer?</h2>
+    <p>Selecciona una de las siguientes opciones:</p>
+
+    <div class="botones-opciones">
+      <a href="{{ url_for('recomendador') }}" class="btn">🧭 Recomendador</a>
+      <a href="{{ url_for('estudio_municipio') }}" class="btn">🏡 Estudio Municipio</a>
+      <a href="{{ url_for('estudio_cluster') }}" class="btn">📊 Estudio Comunidad</a>
+    </div>
+  </div>
+</div>
 {% endblock %}
