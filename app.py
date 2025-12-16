@@ -266,14 +266,8 @@ def recomendador():
     # =========================
     df_local = df.loc[df["grupo"].astype(int) == int(cluster)].copy()
 
-    print("================================")
-    print(f"👉 Población elegida: {poblacion}")
-    print(f"👉 Clúster aplicado: {cluster}")
-    print(f"👉 Municipios en df_local: {len(df_local)}")
-    print("================================")
-
     if df_local.empty:
-        raise ValueError("❌ df_local está vacío: problema con el filtro por clúster")
+        raise ValueError("df_local está vacío: problema con el filtro por clúster")
 
     # =========================
     # 5️⃣ NORMALIZACIÓN (SOLO df_local)
