@@ -1,0 +1,117 @@
+¡Claro! Aquí tienes un **README.md** bonito, claro y profesional para tu proyecto. Incluye descripción, estructura, pasos de ejecución y tecnologías utilizadas:
+
+---
+
+```markdown
+# 🏘️ Visor de Atractividad Territorial
+
+Este proyecto construye un pipeline completo para el análisis y visualización de la **atractividad territorial** de los municipios de la Comunidad de Madrid. A través de la normalización de datos temáticos y su procesamiento por clúster poblacional, se genera una interfaz web interactiva con mapas, rankings y recomendaciones personalizadas.
+
+---
+
+## 📁 Estructura del Proyecto
+
+```
+
+├── notebooks/                     # Notebooks temáticos (economía, salud, etc.)
+├── data/                          # Datos crudos organizados por bloque
+├── data_interfaz/                # Datos procesados listos para la interfaz
+├── external_data/                # Datos externos (población, municipios, etc.)
+├── templates/                     # Archivos HTML (Flask)
+├── static/                        # CSS, JS y recursos estáticos
+├── app.py                         # Aplicación Flask
+├── geometrias-municipios.py      # Genera geometrías GeoJSON (EPSG:4326)
+├── join.py                        # Une datasets normalizados
+├── normalizacion_final_2024.ipynb# Calcula indicadores compuestos normalizados
+├── run_pipeline.sh                # Script de ejecución automatizado
+└── requirements.txt              # Dependencias del entorno
+
+````
+
+---
+
+## 🚀 Ejecución del Pipeline
+
+### Requisitos previos
+
+- Python 3.10+
+- `pip install -r requirements.txt`
+- Jupyter Notebook
+
+### 1. Ejecutar el pipeline completo
+
+```bash
+chmod +x run_pipeline.sh
+./run_pipeline.sh
+````
+
+Este script realiza automáticamente:
+
+1. 🧠 **Ejecución de notebooks temáticos** (`notebooks/*.ipynb`)
+2. 🧩 **Unificación de datasets** (`join.py`)
+3. 📊 **Normalización por clúster** (`normalizacion_final_2024.ipynb`)
+4. 🗺️ **Generación de geometrías GeoJSON** (`geometrias-municipios.py`)
+5. 🌐 **Inicio de la interfaz web** (`app.py` con Flask)
+
+---
+
+## 🌐 Interfaz Web
+
+Una vez lanzada la app (`Flask`), accede a:
+
+```
+http://localhost:5000/
+```
+
+Desde ahí podrás:
+
+* Explorar rankings de municipios por dimensión
+* Ver mapas de clústeres y atractividad
+* Usar el recomendador de municipios basado en preferencias
+
+---
+
+## 📊 Dimensiones Analizadas
+
+Los indicadores se agrupan en las siguientes categorías temáticas:
+
+* 🏫 Educación
+* 🏥 Salud
+* 🚆 Transporte
+* 🏘️ Vivienda
+* 💼 Economía
+
+Cada dimensión es **normalizada por clúster poblacional** (poca, media, mucha población), para asegurar una comparación justa entre municipios similares.
+
+---
+
+## 📦 Requisitos del Proyecto
+
+Las dependencias se encuentran en `requirements.txt`. Para generarlas automáticamente:
+
+```bash
+pip freeze > requirements.txt
+```
+
+---
+
+## 🧠 Autoría y Créditos
+
+Este proyecto ha sido desarrollado como parte de un sistema de análisis territorial basado en datos abiertos, con técnicas de normalización, visualización y web semántica.
+
+---
+
+## ✅ Estado del Proyecto
+
+✔️ Pipeline funcional
+✔️ Interfaz web integrada
+✔️ Resultados por municipio y clúster
+✔️ Recomendador personalizado
+🔜 Exportación RDF / Linked Data (opcional)
+
+---
+
+```
+
+¿Quieres que te lo genere directamente como archivo `README.md`? Te lo puedo preparar para descarga inmediata.
+```
