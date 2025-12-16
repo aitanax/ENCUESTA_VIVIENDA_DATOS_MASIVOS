@@ -4,15 +4,18 @@ echo "=========================================="
 echo "🚀 INICIO DEL PIPELINE DE EJECUCIÓN"
 echo "=========================================="
 
-# Paso 1: Ejecutar notebooks temáticos
+# Crear requirements.txt (opcional, se puede mover al final)
+pip freeze > requirements.txt
+
+# Paso 1: Ejecutar notebooks de bloques temáticos
 echo "📚 Ejecutando notebooks de bloques temáticos..."
 
 notebooks=(
-    "notebooks/economy_final.ipynb"
-    "notebooks/education_final.ipynb"
-    "notebooks/health_final.ipynb"
-    "notebooks/housing_final.ipynb"
-    "notebooks/transport_final.ipynb"
+    "economy_final.ipynb"
+    "education_final.ipynb"
+    "health_final.ipynb"
+    "housing_final.ipynb"
+    "transport_final.ipynb"
 )
 
 for nb in "${notebooks[@]}"; do
@@ -40,7 +43,7 @@ if [ $? -ne 0 ]; then
     exit 1
 fi
 
-# Paso 4: Generar GeoJSON en WGS84
+# Paso 4: Generar geometrías GeoJSON en EPSG:4326
 echo "🗺️ Generando geometrías de municipios (EPSG:4326)..."
 python3 geometrias-municipios.py
 if [ $? -ne 0 ]; then
@@ -48,6 +51,6 @@ if [ $? -ne 0 ]; then
     exit 1
 fi
 
-# Paso 5: Iniciar aplicación Flask
+# Paso 5: Lanzar interfaz web Flask
 echo "🌐 Lanzando la interfaz web..."
 python3 app.py

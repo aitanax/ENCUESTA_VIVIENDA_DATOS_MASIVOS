@@ -59,7 +59,7 @@ df_verificacion["coincide_con_geojson"] = df_verificacion["nombre_norm"].apply(
 )
 
 df_verificacion[["Nombre", "nombre_norm", "coincide_con_geojson"]].to_csv(
-    "verificacion_nombres.csv", index=False
+    "external_data/verificacion_nombres.csv", index=False
 )
 
 # Etiquetas para clústeres
@@ -313,4 +313,4 @@ def estudio_municipio():
     )
 
 if __name__ == "__main__":
-    app.run(debug=True, port=5047)
+    app.run(debug=True, port=5049)
