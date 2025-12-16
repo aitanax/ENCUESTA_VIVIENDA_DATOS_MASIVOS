@@ -4,8 +4,8 @@ echo "=========================================="
 echo "INICIO DEL PIPELINE DE EJECUCIÓN"
 echo "=========================================="
 
-# Crear requirements.txt (opcional, se puede mover al final)
-pip freeze > requirements.txt
+pip install -r requirements.txt
+
 
 # Paso 1: Ejecutar notebooks de bloques temáticos
 echo "Ejecutando notebooks de bloques temáticos..."
