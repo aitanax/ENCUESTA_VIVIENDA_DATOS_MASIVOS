@@ -1,4 +1,4 @@
-# 📊 Visor de Atractividad Territorial – Pipeline de Procesamiento y Visualización
+# 📊 Pipeline de Procesamiento y Visualización para Recomendador de Municipio
 
 ## Descripción general del proyecto
 
