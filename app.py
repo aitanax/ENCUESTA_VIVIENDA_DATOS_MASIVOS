@@ -217,7 +217,21 @@ def recomendador():
     if request.method == "GET":
         return render_template("recomendador.html")
 
-    # 1. Recoger respuestas del usuario
+    # =========================
+    # 1️⃣ POBLACIÓN → CLÚSTER
+    # =========================
+    poblacion = request.form.get("cluster", "media")
+
+    if poblacion == "poca":
+        cluster = 1
+    elif poblacion == "mucha":
+        cluster = 3
+    else:
+        cluster = 2
+
+    # =========================
+    # 2️⃣ PREFERENCIAS
+    # =========================
     educacion = int(request.form.get("educacion", 3))
     salud = int(request.form.get("salud", 3))
     transporte = int(request.form.get("transporte", 3))
@@ -225,18 +239,20 @@ def recomendador():
     housing = int(request.form.get("housing", 3))
     ocio = int(request.form.get("ocio", 3))
     entorno = request.form.get("entorno", "mixto")
-    cluster = request.form.get("cluster", "2")
 
-    # 2. Ajustar según ocio y entorno
+    # =========================
+    # 3️⃣ AJUSTES
+    # =========================
+    if entorno == "urbano":
+        transporte += 1
+        economia += 1
+    elif entorno == "natural":
+        housing += 1
+        salud += 1
+
     transporte += ocio // 2
     economia += ocio // 2
 
-    if entorno == "urbano":
-        cluster = "3"
-    elif entorno == "natural":
-        cluster = "1"
-
-    # 3. Crear diccionario de preferencias
     preferencias = {
         "educacion": educacion,
         "salud": salud,
@@ -245,51 +261,78 @@ def recomendador():
         "housing": housing,
     }
 
-    # 4. Filtrar municipios por grupo
-    df_local = df.copy()
-    df_local = df[df["grupo"].astype(float) == float(cluster)]
+    # =========================
+    # 4️⃣ FILTRADO REAL POR CLÚSTER (CLAVE)
+    # =========================
+    df_local = df.loc[df["grupo"].astype(int) == int(cluster)].copy()
 
-    print(f"👉 Cluster seleccionado: {cluster}")
-    print(f"📊 Municipios disponibles: {len(df_local)}")
-
+    print("================================")
+    print(f"👉 Población elegida: {poblacion}")
+    print(f"👉 Clúster aplicado: {cluster}")
+    print(f"👉 Municipios en df_local: {len(df_local)}")
+    print("================================")
 
     if df_local.empty:
-        df_local = df.copy()
+        raise ValueError("❌ df_local está vacío: problema con el filtro por clúster")
 
-    # 5. Normalizar y calcular índice personalizado
+    # =========================
+    # 5️⃣ NORMALIZACIÓN (SOLO df_local)
+    # =========================
     for dim in preferencias:
         min_val = df_local[dim].min()
         max_val = df_local[dim].max()
+
         if max_val != min_val:
-            df_local[dim + "_norm"] = (df_local[dim] - min_val) / (max_val - min_val)
+            df_local[f"{dim}_norm"] = (df_local[dim] - min_val) / (max_val - min_val)
         else:
-            df_local[dim + "_norm"] = 0.0
+            df_local[f"{dim}_norm"] = 0.0
 
-    total = sum(preferencias.values()) or 1.0
-    df_local["indice_personalizado"] = sum(
-        (preferencias[dim] / total) * df_local[dim + "_norm"] for dim in preferencias
-    )
+    # =========================
+    # 6️⃣ ÍNDICE PERSONALIZADO
+    # =========================
+    suma_pesos = sum(preferencias.values()) or 1.0
 
-    # 6. Escoger un municipio por dimensión destacada (ordenando según preferencia)
-    orden_bloques = sorted(preferencias.items(), key=lambda x: x[1], reverse=True)
+    df_local["indice_personalizado"] = 0.0
+    for dim, peso in preferencias.items():
+        df_local["indice_personalizado"] += (
+            peso / suma_pesos
+        ) * df_local[f"{dim}_norm"]
+
+    # =========================
+    # 7️⃣ SELECCIÓN DE MUNICIPIOS
+    # =========================
+    orden_bloques = sorted(preferencias, key=preferencias.get, reverse=True)
 
     municipios_recomendados = []
     ya_elegidos = set()
 
-    for bloque, _ in orden_bloques:
-        mejor = df_local.sort_values(by=bloque, ascending=False)
-        mejor = mejor[~mejor["Nombre"].isin(ya_elegidos)]
+    for bloque in orden_bloques:
+        mejor = (
+            df_local
+            .sort_values(by=bloque, ascending=False)
+            .loc[~df_local["Nombre"].isin(ya_elegidos)]
+        )
+
         if not mejor.empty:
             municipio = mejor.iloc[0].to_dict()
             municipio["destaca_en"] = bloque
+            municipio["cluster"] = cluster
             municipios_recomendados.append(municipio)
             ya_elegidos.add(municipio["Nombre"])
+
         if len(municipios_recomendados) == 3:
             break
 
-    # ✅ Aquí estaba el error:
     grafico = crear_grafico_resultados(municipios_recomendados)
-    return render_template("resultados.html", resultados=municipios_recomendados, grafico=grafico)
+
+    return render_template(
+        "resultados.html",
+        resultados=municipios_recomendados,
+        grafico=grafico,
+        cluster=cluster,
+        poblacion=poblacion,
+        entorno=entorno
+    )
 
 
 @app.route("/estudio_municipio", methods=["GET", "POST"])
@@ -327,4 +370,4 @@ def estudio_municipio():
     )
 
 if __name__ == "__main__":
-    app.run(debug=True, port=5001)
+    app.run(debug=True, port=5002)

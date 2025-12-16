@@ -19,8 +19,10 @@ cffi==2.0.0
 chardet==4.0.0
 charset-normalizer==3.4.4
 click==8.1.7
+cloud-init==25.1.4
 colorama==0.4.4
 comm==0.2.3
+command-not-found==0.3
 configobj==5.0.6
 constantly==15.1.0
 cryptography==3.4.8
@@ -130,6 +132,7 @@ pyrsistent==0.18.1
 pyserial==3.5
 pyshacl==0.30.1
 pyspark==3.5.1
+python-apt==2.4.0+ubuntu4.1
 python-constraint==1.4.0
 python-dateutil==2.9.0.post0
 python-json-logger==4.0.0
@@ -153,9 +156,11 @@ service-identity==18.1.0
 shapely==2.0.4
 six==1.16.0
 soupsieve==2.8
+SPARQLWrapper==2.0.0
 spyne==2.14.0
 stack-data==0.6.3
-statsmodels==0.14.6ç
+statsmodels==0.14.6
+systemd-python==234
 terminado==0.18.1
 tinycss2==1.4.0
 tomli==2.3.0
@@ -164,6 +169,7 @@ traitlets==5.14.3
 Twisted==22.1.0
 typing_extensions==4.15.0
 tzdata==2024.1
+ubuntu-pro-client==8001
 ufw==0.36.1
 unattended-upgrades==0.1
 Unidecode==1.4.0
