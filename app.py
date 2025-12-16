@@ -70,73 +70,87 @@ CLUSTER_LABELS = {"1.0": "Poca población", "2.0": "Media población", "3.0": "M
 @app.route("/")
 def index():
     return render_template("index.html")
+
 @app.route("/estudio_cluster", methods=["GET", "POST"])
 def estudio_cluster():
+
+    # =========================
+    # GET → selector
+    # =========================
     if request.method == "GET":
         clusters = sorted(df["grupo"].dropna().unique())
         cluster_labels = [(c, CLUSTER_LABELS.get(str(c), str(c))) for c in clusters]
-        return render_template("estudio_cluster.html", clusters=cluster_labels)
+        return render_template(
+            "estudio_cluster.html",
+            clusters=cluster_labels
+        )
 
-    # -------------------------
-    # 1️⃣ POST: cluster elegido
-    # -------------------------
+    # =========================
+    # POST → clúster elegido
+    # =========================
     cluster = request.form.get("cluster")
 
+    # 1️⃣ Filtrar por clúster
     df_cluster = df[df["grupo"].astype(str) == cluster].copy()
 
-    # -------------------------
-    # 2️⃣ Normalizar nombres CSV
-    # -------------------------
+    # 2️⃣ Normalizar nombres
     df_cluster["nombre_norm"] = df_cluster["Nombre"].apply(normalizar)
 
-    print("\n🧾 EJEMPLOS CSV normalizados:")
-    print(df_cluster[["Nombre", "nombre_norm"]].head(10))
+    # 3️⃣ Coincidencia con GeoJSON
+    geojson_nombres = {
+        f["properties"]["ETIQUETA_NORM"]
+        for f in geojson_data["features"]
+    }
 
-    # -------------------------
-    # 3️⃣ Nombres GeoJSON
-    # -------------------------
-    geojson_nombres = set(
-        f["properties"]["ETIQUETA_NORM"] for f in geojson_data["features"]
-    )
-
-    df_cluster_filtrado = df_cluster[
+    df_cluster = df_cluster[
         df_cluster["nombre_norm"].isin(geojson_nombres)
-    ]
+    ].copy()
 
-    print("COINCIDENCIAS CSV ↔ GEOJSON:", len(df_cluster_filtrado))
+    # 4️⃣ Ranking por TOTAL
+    df_cluster["total"] = pd.to_numeric(df_cluster["total"], errors="coerce")
+    df_cluster = df_cluster.dropna(subset=["total"])
 
-    if df_cluster_filtrado.empty:
-        print(" NO HAY COINCIDENCIAS — se usará fallback (SIN MAPA REAL)")
-        df_cluster_filtrado = df_cluster
-    else:
-        print("PRIMERAS COINCIDENCIAS:")
-        print(df_cluster_filtrado[["Nombre", "nombre_norm", "mean_per_row"]].head())
+    df_cluster = df_cluster.sort_values(
+        "total", ascending=False
+    ).reset_index(drop=True)
 
+    df_cluster["ranking"] = df_cluster.index + 1
 
-
+    # =========================
+    # MAPA: SOLO LÍNEAS + HOVER NOMBRE
+    # =========================
     fig = px.choropleth_mapbox(
-        df_cluster_filtrado,
+        df_cluster,
         geojson=geojson_data,
         locations="nombre_norm",
         featureidkey="properties.ETIQUETA_NORM",
-        color="mean_per_row",
+        color_discrete_sequence=["rgba(0,0,0,0)"],
         center={"lat": 40.4168, "lon": -3.7038},
-        mapbox_style="carto-positron",
         zoom=8,
-        opacity=0.6,
-        labels={"mean_per_row": "Índice medio"}
+        hover_name="Nombre"
     )
-    fig.update_layout(margin={"r": 0, "t": 0, "l": 0, "b": 0})
 
+    fig.update_traces(
+        marker_line_width=1,
+        marker_line_color="black"
+    )
 
-    grafico_json = fig.to_json()
+    fig.update_layout(
+        mapbox_style="carto-positron",
+        margin={"r": 0, "t": 0, "l": 0, "b": 0}
+    )
 
+    # =========================
+    # Render
+    # =========================
     return render_template(
         "resultado_cluster.html",
         cluster=CLUSTER_LABELS.get(cluster, cluster),
         datos=df_cluster.to_dict(orient="records"),
-        grafico=grafico_json
+        grafico=fig.to_json()
     )
+
+
 
 DATA_PATH = os.path.join("data_interfaz", "valores.csv")
 df = pd.read_csv(DATA_PATH)
@@ -313,4 +327,4 @@ def estudio_municipio():
     )
 
 if __name__ == "__main__":
-    app.run(debug=True, port=5049)
+    app.run(debug=True, port=5001)

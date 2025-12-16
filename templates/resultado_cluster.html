@@ -5,33 +5,231 @@
 <div class="card">
   <h2>📍 Municipios con {{ cluster }}</h2>
 
-  <div id="grafico-cluster" style="height: 600px;"></div>
+  <!-- MAPA -->
+  <div id="grafico-cluster" style="height:600px;"></div>
 
-  <table class="tabla-resultados">
-    <thead>
-      <tr>
-        <th>Municipio</th>
-        <th>Índice medio</th>
-      </tr>
-    </thead>
-    <tbody>
-      {% for r in datos %}
-        <tr>
-          <td>{{ r["Nombre"] }}</td>
-          <td>{{ "%.3f"|format(r["mean_per_row"]) }}</td>
-        </tr>
-      {% endfor %}
-    </tbody>
-  </table>
+  <!-- INFO MUNICIPIO -->
+<div id="info-municipio" class="info-card" style="display:none;">
+  <h3 id="info-nombre" class="info-title"></h3>
 
-  <a href="{{ url_for('estudio_cluster') }}" class="btn-secundario">🔙 Volver</a>
+  <!-- MÉTRICAS -->
+  <div class="info-metrics">
+    <div class="metric">
+      <span class="metric-label">Índice de atractividad</span>
+      <span class="metric-value" id="info-indice"></span>
+    </div>
+    <div class="metric">
+      <span class="metric-label">Ranking en el clúster</span>
+      <span class="metric-value" id="info-ranking"></span>
+    </div>
+  </div>
+
+  <!-- ACCIONES -->
+  <div class="info-actions">
+    <button id="btn-graficos" class="btn-secundario">
+      📊 Mostrar gráficos
+    </button>
+  </div>
 </div>
 
-<!-- Incluir Plotly -->
+
+  <!-- GRÁFICOS -->
+  <div id="graficos-municipio" style="display:none; margin-top:24px;">
+    <div id="grafico-radar" style="height:300px;"></div>
+    <div id="grafico-barra" style="height:300px;"></div>
+    <div id="grafico-distribucion" style="height:250px;"></div>
+  </div>
+
+  <!-- RANKING -->
+  <button id="btn-ranking" class="btn-secundario" style="margin-top:20px;">
+    🏆 Mostrar ranking completo del clúster
+  </button>
+
+  <div id="ranking-cluster" class="ranking-card" style="display:none;">
+    <h3>🏆 Ranking del clúster</h3>
+    <ul id="lista-ranking" class="ranking-list"></ul>
+  </div>
+
+  <a href="{{ url_for('estudio_cluster') }}" class="btn-secundario" style="margin-top:20px;">
+    🔙 Volver
+  </a>
+</div>
+
 <script src="https://cdn.plot.ly/plotly-latest.min.js"></script>
+
 <script>
-  const clusterData = JSON.parse({{ grafico | tojson | safe }});
-  Plotly.newPlot("grafico-cluster", clusterData.data, clusterData.layout);
+const fig = JSON.parse({{ grafico | tojson | safe }});
+const datos = {{ datos | tojson | safe }};
+const plotDiv = document.getElementById("grafico-cluster");
+
+const baseWidth = fig.data[0].marker.line.width || 1;
+const baseColor = fig.data[0].marker.line.color || "black";
+
+fig.data[0].selected = {
+  marker: { line: { color:"#1976d2", width: baseWidth + 2 } }
+};
+fig.data[0].unselected = {
+  marker: { line: { color: baseColor, width: baseWidth } }
+};
+
+Plotly.newPlot(plotDiv, fig.data, fig.layout);
+
+let selectedIndex = null;
+let municipioSeleccionado = null;
+
+// HOVER
+plotDiv.on("plotly_hover", e => {
+  Plotly.restyle(plotDiv, { selectedpoints:[[e.points[0].pointIndex]] });
+});
+
+plotDiv.on("plotly_unhover", () => {
+  if (selectedIndex === null) {
+    Plotly.restyle(plotDiv, { selectedpoints:[null] });
+  }
+});
+
+// CLICK
+plotDiv.on("plotly_click", e => {
+  selectedIndex = e.points[0].pointIndex;
+  Plotly.restyle(plotDiv, { selectedpoints:[[selectedIndex]] });
+
+  const nombre = e.points[0].hovertext;
+  municipioSeleccionado = datos.find(d => d.Nombre === nombre);
+
+  if (municipioSeleccionado) {
+    document.getElementById("info-nombre").innerText = municipioSeleccionado.Nombre;
+    document.getElementById("info-indice").innerText =
+      municipioSeleccionado.total.toFixed(3);
+    document.getElementById("info-ranking").innerText =
+      "#" + municipioSeleccionado.ranking;
+    document.getElementById("info-municipio").style.display = "block";
+  }
+});
+
+// BOTÓN GRÁFICOS
+const btnGraficos = document.getElementById("btn-graficos");
+const graficosDiv = document.getElementById("graficos-municipio");
+
+btnGraficos.addEventListener("click", () => {
+  if (graficosDiv.style.display === "none") {
+    graficosDiv.style.display = "block";
+    btnGraficos.innerText = "❌ Ocultar gráficos";
+    renderGraficos();
+  } else {
+    graficosDiv.style.display = "none";
+    btnGraficos.innerText = "📊 Mostrar gráficos";
+  }
+});
+
+function renderGraficos() {
+  const m = municipioSeleccionado;
+  if (!m) return;
+
+  // RADAR
+  Plotly.newPlot("grafico-radar", [{
+    type:"scatterpolar",
+    r:[m.educacion,m.salud,m.transporte,m.economia,m.housing],
+    theta:["Educación","Salud","Transporte","Economía","Vivienda"],
+    fill:"toself"
+  }], {
+    title:"Perfil del municipio",
+    polar:{radialaxis:{range:[0,1]}},
+    margin:{t:40}
+  });
+
+  // BARRA
+  Plotly.newPlot("grafico-barra", [{
+    type:"bar",
+    x:["Municipio","Media clúster"],
+    y:[m.total, datos.reduce((a,b)=>a+b.total,0)/datos.length]
+  }], { title:"Índice vs media del clúster" });
+
+  // DISTRIBUCIÓN
+  Plotly.newPlot("grafico-distribucion", [{
+    type:"box",
+    y:datos.map(d=>d.total),
+    boxpoints:false
+  }], { title:"Distribución del índice en el clúster" });
+}
+
+// RANKING COMPLETO
+const btnRanking = document.getElementById("btn-ranking");
+const rankingDiv = document.getElementById("ranking-cluster");
+const listaRanking = document.getElementById("lista-ranking");
+
+btnRanking.addEventListener("click", () => {
+  if (rankingDiv.style.display === "none") {
+    listaRanking.innerHTML = "";
+    datos.sort((a,b)=>a.ranking-b.ranking).forEach(d=>{
+      const li=document.createElement("li");
+      li.innerHTML=`<span class="rank">#${d.ranking}</span><span>${d.Nombre}</span><span>${d.total.toFixed(3)}</span>`;
+      listaRanking.appendChild(li);
+    });
+    rankingDiv.style.display="block";
+    btnRanking.innerText="❌ Ocultar ranking";
+  } else {
+    rankingDiv.style.display="none";
+    btnRanking.innerText="🏆 Mostrar ranking completo del clúster";
+  }
+});
 </script>
+
+<style>
+ .ranking-card {
+  margin-top:24px; padding:20px; border-radius:14px;
+  background:#fff; box-shadow:0 8px 20px rgba(0,0,0,.08);
+}
+  .info-card {
+  margin-top: 24px;
+  padding: 24px;
+  border-radius: 16px;
+  background: #ffffff;
+  box-shadow: 0 8px 24px rgba(0,0,0,0.08);
+  text-align: center;
+}
+
+.info-title {
+  margin-bottom: 20px;
+  font-size: 1.4rem;
+}
+
+.info-metrics {
+  display: flex;
+  gap: 24px;
+  justify-content: center;
+  margin-bottom: 20px;
+}
+
+.metric {
+  min-width: 180px;
+  background: #f6f7fb;
+  padding: 16px;
+  border-radius: 14px;
+}
+
+.metric-label {
+  display: block;
+  font-size: 0.85rem;
+  color: #666;
+  margin-bottom: 6px;
+}
+
+.metric-value {
+  font-size: 1.4rem;
+  font-weight: 700;
+}
+
+.info-actions {
+  display: flex;
+  justify-content: center;
+}
+
+.ranking-list { list-style:none; padding:0; }
+.ranking-list li {
+  display:grid; grid-template-columns:60px 1fr 80px;
+  padding:10px; margin-bottom:6px; background:#f3f4f7; border-radius:10px;
+}
+.rank { font-weight:bold; color:#1976d2; }
+</style>
 
 {% endblock %}
