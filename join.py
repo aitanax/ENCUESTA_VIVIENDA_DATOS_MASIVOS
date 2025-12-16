@@ -11,7 +11,7 @@ def combinar_csvs_por_anio(base_folder, output_prefix, municipios_path):
         print(f"No se encontraron CSVs en {base_folder}")
         return
 
-    print(f"🧩 Encontrados {len(csv_files)} archivos CSV en total")
+    print(f"Encontrados {len(csv_files)} archivos CSV en total")
 
     # Agrupar los archivos por año detectado en la ruta
     archivos_por_anio = defaultdict(list)
@@ -25,14 +25,14 @@ def combinar_csvs_por_anio(base_folder, output_prefix, municipios_path):
     try:
         municipios_df = pd.read_csv(municipios_path)
         municipios_df["Nombre"] = municipios_df["Nombre"].astype(str).str.strip()
-        print(f"📌 municipios.csv cargado con {len(municipios_df)} filas")
+        print(f"municipios.csv cargado con {len(municipios_df)} filas")
     except Exception as e:
         print(f"❌ Error cargando {municipios_path}: {e}")
         return
 
     # Procesar por año
     for anio, archivos in archivos_por_anio.items():
-        print(f"\n📁 Procesando año {anio} con {len(archivos)} archivos...")
+        print(f"\nProcesando año {anio} con {len(archivos)} archivos...")
 
         dataframes = []
         for file in archivos:
@@ -41,10 +41,10 @@ def combinar_csvs_por_anio(base_folder, output_prefix, municipios_path):
                 df["Nombre"] = df["Nombre"].astype(str).str.strip()
                 dataframes.append(df)
             except Exception as e:
-                print(f"⚠️ Error leyendo {file}: {e}")
+                print(f"Error leyendo {file}: {e}")
 
         if not dataframes:
-            print(f"⚠️ No se pudieron cargar CSVs para el año {anio}")
+            print(f"No se pudieron cargar CSVs para el año {anio}")
             continue
 
         # Merge por "Nombre"
@@ -58,7 +58,7 @@ def combinar_csvs_por_anio(base_folder, output_prefix, municipios_path):
         # Guardar resultado
         output_file = f"{output_prefix}_{anio}.csv"
         df_final.to_csv(output_file, index=False)
-        print(f"✅ Archivo combinado + municipios para {anio} guardado en: {output_file}")
+        print(f"Archivo combinado + municipios para {anio} guardado en: {output_file}")
 
 # USO
 combinar_csvs_por_anio(
