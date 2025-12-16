@@ -12,7 +12,7 @@ if not CLIENT_ID or not CLIENT_SECRET:
     raise RuntimeError("Faltan IDEALISTA_CLIENT_ID / IDEALISTA_CLIENT_SECRET")
 
 MUNICIPIOS_CSV = "external_data/municipios_madrid.csv"
-OUTPUT_DIR = Path("csv_municipios")
+OUTPUT_DIR = Path("data/vivienda/datos_filtrados")
 
 OPERATION = "buy"
 PROPERTY_TYPE = "homes"
