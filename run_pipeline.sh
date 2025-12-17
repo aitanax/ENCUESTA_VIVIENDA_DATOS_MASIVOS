@@ -4,10 +4,32 @@ echo "=========================================="
 echo "INICIO DEL PIPELINE DE EJECUCIÓN"
 echo "=========================================="
 
+# =========================
+# CREAR ENTORNO VIRTUAL
+# =========================
+if [ ! -d "venv" ]; then
+    echo "Creando entorno virtual..."
+    python3 -m venv venv
+else
+    echo "Entorno virtual ya existente."
+fi
+
+# =========================
+# ACTIVAR ENTORNO
+# =========================
+echo "Activando entorno virtual..."
+source venv/bin/activate
+
+# =========================
+# INSTALAR DEPENDENCIAS
+# =========================
+echo "Instalando dependencias..."
+pip install --upgrade pip
 pip install -r requirements.txt
 
-
-# Paso 1: Ejecutar notebooks de bloques temáticos
+# =========================
+# EJECUTAR NOTEBOOKS
+# =========================
 echo "Ejecutando notebooks de bloques temáticos..."
 
 notebooks=(
@@ -23,34 +45,53 @@ for nb in "${notebooks[@]}"; do
     jupyter nbconvert --to notebook --execute "$nb" --output "${nb%.ipynb}_out.ipynb"
     if [ $? -ne 0 ]; then
         echo "Error en $nb. Abortando."
+        deactivate
         exit 1
     fi
 done
 
-# Paso 2: Ejecutar join.py
+# =========================
+# JOIN DE DATASETS
+# =========================
 echo "Unificando datasets con join.py..."
-python3 join.py
+python join.py
 if [ $? -ne 0 ]; then
     echo "Error al ejecutar join.py"
+    deactivate
     exit 1
 fi
 
-# Paso 3: Ejecutar normalización
+# =========================
+# NORMALIZACIÓN FINAL
+# =========================
 echo "Ejecutando normalización final..."
-jupyter nbconvert --to notebook --execute "normalizacion_final_2024.ipynb" --output "normalizacion_final_2024_out.ipynb"
+jupyter nbconvert --to notebook --execute "normalizacion_final_2024.ipynb" \
+    --output "normalizacion_final_2024_out.ipynb"
+
 if [ $? -ne 0 ]; then
     echo "Error en normalizacion_final_2024.ipynb"
+    deactivate
     exit 1
 fi
 
-# Paso 4: Generar geometrías GeoJSON en EPSG:4326
+# =========================
+# GENERAR GEOMETRÍAS
+# =========================
 echo "Generando geometrías de municipios (EPSG:4326)..."
-python3 geometrias-municipios.py
+python geometrias-municipios.py
 if [ $? -ne 0 ]; then
     echo "Error al generar geometrías"
+    deactivate
     exit 1
 fi
 
-# Paso 5: Lanzar interfaz web Flask
+# =========================
+# LANZAR FLASK
+# =========================
 echo "Lanzando la interfaz web..."
-python3 app.py
+python app.py
+
+# =========================
+# LIMPIEZA
+# =========================
+deactivate
